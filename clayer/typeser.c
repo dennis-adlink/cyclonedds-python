@@ -30,6 +30,21 @@ void ddspy_typeid_deser (dds_istream_t * is, dds_typeid_t ** type_id)
 #endif
 }
 
+void ddspy_typeinfo_ser (dds_ostream_t * os, dds_typeinfo_t * type_info)
+{
+#ifdef DDS_HAS_TYPE_DISCOVERY
+    dds_stream_write(os, (char*) type_info, DDS_XTypes_TypeInformation_desc.m_ops);
+#endif
+}
+
+void ddspy_typeinfo_deser (dds_istream_t * is, dds_typeinfo_t ** type_info)
+{
+#ifdef DDS_HAS_TYPE_DISCOVERY
+    *type_info = dds_alloc(sizeof (DDS_XTypes_TypeInformation));
+    dds_stream_read (is, (void *) *type_info, DDS_XTypes_TypeInformation_desc.m_ops);
+#endif
+}
+
 void ddspy_typeobj_ser (dds_ostream_t * os, dds_typeobj_t * type_obj)
 {
 #ifdef DDS_HAS_TYPE_DISCOVERY

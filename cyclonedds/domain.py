@@ -13,11 +13,12 @@
 import ctypes as ct
 from typing import List, Optional
 
+from . import _clayer as cl
 from .internal import c_call, dds_c_t
 from .core import Entity, DDSException, Listener
 from .topic import Topic
 from .qos import _CQos, LimitedScopeQos, DomainParticipantQos, Qos
-
+from .idl._typesupport.DDS.XTypes._ddsi_xt_type_object import TypeInformation
 
 class Domain(Entity):
     """A Domain represents a DDS domain with a set configuration. On the network a Domain
@@ -102,11 +103,11 @@ class DomainParticipant(Entity):
             if cqos:
                 _CQos.cqos_destroy(cqos)
 
-    def find_topic(self, name) -> Optional[Topic]:
+    def find_topic(self, scope, name, type_info : TypeInformation, timeout: int) -> Optional[Topic]:
         """Locate a Topic. This is not really useful as long as you don't know the DataType of the topic.
         When XTypes support is in this will be more useful.
         """
-        ret = self._find_topic(self._ref, name.encode("ascii"))
+        ret = cl.ddspy_find_topic(scope, self._ref, name, type_info.serialize(use_version_2=True)[4:], timeout)
         if ret > 0:
             # Note that this function returns a _new_ topic instance which we do not have in our entity list
             return Topic._init_from_retcode(ret)
@@ -122,5 +123,6 @@ class DomainParticipant(Entity):
         pass
 
     @c_call("dds_find_topic")
-    def _find_topic(self, participant: dds_c_t.entity, name: ct.c_char_p) -> dds_c_t.entity:
+    def _find_topic(self, scope: dds_c_t.find_scope, participant: dds_c_t.entity, name: ct.c_char_p, type_info: dds_c_t.type_info_p, timeout: dds_c_t.duration) \
+            -> dds_c_t.entity:
         pass

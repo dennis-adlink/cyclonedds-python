@@ -18,6 +18,8 @@
 
 void ddspy_typeid_ser (dds_ostream_t*, dds_typeid_t *);
 void ddspy_typeid_deser (dds_istream_t*, dds_typeid_t **);
+void ddspy_typeinfo_ser (dds_ostream_t*, dds_typeinfo_t *);
+void ddspy_typeinfo_deser (dds_istream_t*, dds_typeinfo_t **);
 void ddspy_typeobj_ser (dds_ostream_t*, dds_typeobj_t *);
 void ddspy_typeobj_deser (dds_istream_t*, dds_typeobj_t **);
 

@@ -1942,6 +1942,43 @@ ddspy_take_endpoint(PyObject *self, PyObject *args)
 /* end builtin topic */
 
 
+static PyObject *
+ddspy_find_topic(PyObject *self, PyObject *args)
+{
+    dds_find_scope_t scope;
+    dds_entity_t participant;
+    char *name;
+    Py_buffer type_info_buffer;
+    dds_duration_t timeout;
+
+    dds_istream_t type_info_stream;
+    dds_typeinfo_t * type_info = NULL;
+    dds_return_t sts = DDS_RETCODE_ERROR;
+
+    if (!PyArg_ParseTuple(args, "iisy*L", &scope, &participant, &name, &type_info_buffer, &timeout))
+        return NULL;
+
+    type_info_stream.m_buffer = type_info_buffer.buf;
+    type_info_stream.m_size = (uint32_t) type_info_buffer.len;
+    type_info_stream.m_index = 0;
+    type_info_stream.m_xcdr_version = CDR_ENC_VERSION_2;
+    ddspy_typeinfo_deser(&type_info_stream, &type_info);
+    PyBuffer_Release(&type_info_buffer);
+
+    if (type_info == NULL) {
+        return PyLong_FromLong(-1l);
+    }
+
+    Py_BEGIN_ALLOW_THREADS
+    sts = dds_find_topic(scope, participant, name, type_info, timeout);
+    Py_END_ALLOW_THREADS
+
+    dds_free(type_info);
+
+    if (PyErr_Occurred()) return NULL;
+
+    return PyLong_FromLong((long)sts);
+}
 
 #ifdef DDS_HAS_TYPE_DISCOVERY
 
@@ -2109,6 +2146,10 @@ PyMethodDef ddspy_funcs[] = {
 		(PyCFunction)ddspy_take_endpoint,
 		METH_VARARGS,
 		ddspy_docs},
+    {   "ddspy_find_topic",
+        (PyCFunction)ddspy_find_topic,
+        METH_VARARGS,
+        ddspy_docs},
 #ifdef DDS_HAS_TYPE_DISCOVERY
     {   "ddspy_get_typeobj",
         (PyCFunction)ddspy_get_typeobj,

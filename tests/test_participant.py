@@ -17,8 +17,7 @@ def test_find_topic():
     tp = Topic(dp, "Message", Message)
 
     assert isgoodentity(tp)
-    
-    xtp = dp.find_topic("Message")
+    xtp = dp.find_topic(0, "Message", tp.data_type.__idl__.get_type_info(), 0)
 
     assert xtp.typename == tp.typename
     assert xtp.name == tp.name

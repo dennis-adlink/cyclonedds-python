@@ -286,6 +286,8 @@ class dds_c_t:  # noqa N801
     listener_p = ct.c_void_p
     topic_descriptor_p = ct.c_void_p
     returnv = ct.c_int32
+    find_scope = ct.c_int
+    type_info_p = ct.c_void_p
 
     class inconsistent_topic_status(ct.Structure):  # noqa N801
         _fields_ = [('total_count', ct.c_uint32),
