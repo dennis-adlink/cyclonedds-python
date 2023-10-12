@@ -256,12 +256,15 @@ class Builder:
                         lentype = LenType.NextIntDualUseLen
                     elif isinstance(machine, ArrayMachine):
                         lentype = LenType.NextIntDualUseLen if machine.add_size_header else LenType.NextIntLen
+                    elif isinstance(machine, StringMachine):
+                        lentype = LenType.NextIntDualUseLen
                     else:
                         lentype = LenType.NextIntLen
 
                     mutablemembers.append(MutableMember(
                         name=name,
-                        key=keylist and name in keylist,
+                        # FIXME: (parent_key and not keylist) or (keylist and name in keylist)
+                        key=not keylist or name in keylist,
                         optional=optional,
                         lentype=lentype,
                         must_understand=field_annotations.get(name, {}).get("must_understand", False),
